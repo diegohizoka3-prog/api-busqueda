@@ -2,8 +2,17 @@ const express = require('express');
 const { CAMPOS, crearRegistro, obtenerRegistros, obtenerPorId, actualizarRegistro, eliminarRegistro, importarRegistros } = require('./datos');
 const { buscar } = require('./buscador');
 const { obtenerEstadisticas } = require('./estadisticas');
+const { saveData } = require('./persistencia');
 
 const router = express.Router();
+const estado = {
+  obtener: obtenerRegistros,
+  cargar: (registros) => registros.forEach(({ id, created_at, ...datos }) => crearRegistro(datos))
+};
+
+function guardarEstado() {
+  saveData(estado).catch((error) => console.warn('Persistencia no disponible:', error.message));
+}
 
 function listaUnica(campo) {
   return [...new Set(obtenerRegistros().map((registro) => registro[campo]))].sort();
@@ -29,7 +38,9 @@ router.get('/buscar', (req, res) => res.json(buscar(req.query)));
 
 router.post('/registros', (req, res, next) => {
   try {
-    return res.status(201).json(crearRegistro(req.body));
+    const registro = crearRegistro(req.body);
+    guardarEstado();
+    return res.status(201).json(registro);
   } catch (error) {
     error.status = 400;
     return next(error);
@@ -40,6 +51,7 @@ router.put('/registros/:id', (req, res, next) => {
   try {
     const registro = actualizarRegistro(req.params.id, req.body);
     if (!registro) return res.status(404).json({ error: 'Registro no encontrado.' });
+    guardarEstado();
     return res.json(registro);
   } catch (error) {
     error.status = 400;
@@ -50,13 +62,16 @@ router.put('/registros/:id', (req, res, next) => {
 router.delete('/registros/:id', (req, res) => {
   const registro = eliminarRegistro(req.params.id);
   if (!registro) return res.status(404).json({ error: 'Registro no encontrado.' });
+  guardarEstado();
   return res.json({ mensaje: 'Registro eliminado.', registro });
 });
 
 router.post('/importar-excel', (req, res, next) => {
   try {
     const lista = Array.isArray(req.body) ? req.body : req.body.registros;
-    return res.status(201).json({ importados: importarRegistros(lista) });
+    const importados = importarRegistros(lista);
+    guardarEstado();
+    return res.status(201).json({ importados });
   } catch (error) {
     error.status = 400;
     return next(error);
@@ -86,4 +101,4 @@ const swaggerDocument = {
   }]))]))
 };
 
-module.exports = { router, swaggerDocument };
+module.exports = { router, swaggerDocument, estado };

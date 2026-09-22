@@ -4,7 +4,8 @@ const compression = require('compression');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
-const { router, swaggerDocument } = require('./rutas');
+const { router, swaggerDocument, estado } = require('./rutas');
+const { initTable, loadData } = require('./persistencia');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -22,7 +23,15 @@ app.use((error, req, res, next) => {
 });
 
 if (require.main === module) {
-  app.listen(port, () => console.log(`api-busqueda escuchando en el puerto ${port}`));
+  (async () => {
+    try {
+      await initTable();
+      await loadData(estado);
+    } catch (error) {
+      console.warn('Persistencia no disponible; se usara memoria:', error.message);
+    }
+    app.listen(port, () => console.log(`api-busqueda escuchando en el puerto ${port}`));
+  })();
 }
 
 module.exports = app;
