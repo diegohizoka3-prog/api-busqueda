@@ -5,7 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "seed": "node scripts/seed.js"
   },
   "dependencies": {
     "compression": "^1.8.1",
@@ -14,7 +15,8 @@
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "pg": "^8.23.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
