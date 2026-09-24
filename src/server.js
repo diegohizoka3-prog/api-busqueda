@@ -17,6 +17,18 @@ app.use(express.json({ limit: '2mb' }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false }));
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1', router);
+app.get('/', (req, res) => {
+  res.json({
+    name: 'api-busqueda',
+    status: 'ok',
+    version: process.env.npm_package_version || 'unknown',
+    docs: '/api/v1/docs',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/docs', (req, res) => res.redirect('/api/v1/docs'));
+
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
   return res.status(error.status || 500).json({ error: error.status ? error.message : 'Error interno del servidor.' });
