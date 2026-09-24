@@ -92,7 +92,7 @@ router.post('/importar-excel', (req, res, next) => {
     const lista = Array.isArray(req.body) ? req.body : req.body.registros;
     const importados = importarRegistros(lista);
     guardarEstado();
-    return res.status(201).json({ importados });
+    return res.status(201).json({ importados: importados.length });
   } catch (error) {
     error.status = 400;
     return next(error);
@@ -100,7 +100,7 @@ router.post('/importar-excel', (req, res, next) => {
 });
 
 const parametrosBusqueda = [
-  'q', 'salon', 'profesor', 'carrera', 'modulo', 'horarioClase', 'nombreModulo'
+  'q', 'salon', 'profesor', 'carrera', 'modulo', 'horarioClase', 'nombreModulo', 'semestre', 'corte'
 ].map((nombre) => ({
   name: nombre,
   in: 'query',
@@ -143,8 +143,8 @@ const swaggerDocument = {
   components: {
     schemas: {
       Registro: {
-        type: 'object', required: CAMPOS,
-        properties: { id: { type: 'integer' }, ...Object.fromEntries(CAMPOS.map((campo) => [campo, { type: 'string' }])) }
+        type: 'object', required: ['salon', 'carrera', 'modulo', 'horarioClase', 'nombreModulo'],
+        properties: { id: { type: 'integer' }, ...Object.fromEntries(CAMPOS.map((campo) => [campo, { type: 'string' }])), semestre: { type: 'string' }, corte: { type: 'string' }, codigoModulo: { type: 'string' } }
       }
     }
   },

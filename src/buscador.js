@@ -8,7 +8,7 @@ function buscar(filtros = {}) {
 
   return obtenerRegistros().filter((registro) => filtrosActivos.every(([campo, valor]) => {
     if (campo === 'q') return CAMPOS.some((nombre) => normalizar(registro[nombre]).includes(valor));
-    return normalizar(registro[campo]).includes(valor);
+    return normalizar(registro[campo] || '').includes(valor);
   }));
 }
 

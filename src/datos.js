@@ -4,8 +4,13 @@ const CAMPOS = [
   'carrera',
   'modulo',
   'horarioClase',
-  'nombreModulo'
+  'nombreModulo',
+  'semestre',
+  'corte',
+  'codigoModulo'
 ];
+
+const CAMPOS_REQUERIDOS = ['salon', 'carrera', 'modulo', 'horarioClase', 'nombreModulo'];
 
 let registros = [];
 let siguienteId = 1;
@@ -15,7 +20,7 @@ function validarRegistro(datos) {
     throw new Error('El registro debe ser un objeto JSON.');
   }
 
-  const faltantes = CAMPOS.filter((campo) => typeof datos[campo] !== 'string' || !datos[campo].trim());
+  const faltantes = CAMPOS_REQUERIDOS.filter((campo) => typeof datos[campo] !== 'string' || !datos[campo].trim());
   if (faltantes.length) {
     throw new Error(`Faltan campos obligatorios: ${faltantes.join(', ')}.`);
   }
@@ -24,7 +29,7 @@ function validarRegistro(datos) {
 function crearRegistro(datos) {
   validarRegistro(datos);
   const registro = { id: siguienteId++ };
-  for (const campo of CAMPOS) registro[campo] = datos[campo].trim();
+  for (const campo of CAMPOS) registro[campo] = typeof datos[campo] === 'string' ? datos[campo].trim() : '';
   registros.push(registro);
   return registro;
 }
@@ -42,7 +47,7 @@ function actualizarRegistro(id, datos) {
   const indice = registros.findIndex((registro) => registro.id === Number(id));
   if (indice === -1) return null;
   const actualizado = { id: registros[indice].id };
-  for (const campo of CAMPOS) actualizado[campo] = datos[campo].trim();
+  for (const campo of CAMPOS) actualizado[campo] = typeof datos[campo] === 'string' ? datos[campo].trim() : '';
   registros[indice] = actualizado;
   return actualizado;
 }

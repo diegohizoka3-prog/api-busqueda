@@ -22,6 +22,9 @@ async function initTable() {
         modulo TEXT,
         "horarioClase" TEXT,
         "nombreModulo" TEXT,
+        semestre TEXT,
+        corte TEXT,
+        "codigoModulo" TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
@@ -36,7 +39,7 @@ async function loadData(state) {
 
   try {
     const { rows } = await database.query(`
-      SELECT id, salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", created_at
+      SELECT id, salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, "codigoModulo", created_at
       FROM registros
       ORDER BY id
     `);
@@ -56,9 +59,9 @@ async function saveData(state) {
     await client.query('DELETE FROM registros');
     for (const registro of state.obtener()) {
       await client.query(`
-        INSERT INTO registros (salon, profesor, carrera, modulo, "horarioClase", "nombreModulo")
-        VALUES ($1, $2, $3, $4, $5, $6)
-      `, [registro.salon, registro.profesor, registro.carrera, registro.modulo, registro.horarioClase, registro.nombreModulo]);
+        INSERT INTO registros (salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, "codigoModulo")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `, [registro.salon, registro.profesor, registro.carrera, registro.modulo, registro.horarioClase, registro.nombreModulo, registro.semestre, registro.corte, registro.codigoModulo]);
     }
     await client.query('COMMIT');
   } catch (error) {

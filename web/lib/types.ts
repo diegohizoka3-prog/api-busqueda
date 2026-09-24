@@ -6,6 +6,9 @@ export interface Registro {
   modulo: string
   horarioClase: string
   nombreModulo: string
+  semestre?: string
+  corte?: string
+  codigoModulo?: string
 }
 
 export interface Estadisticas {

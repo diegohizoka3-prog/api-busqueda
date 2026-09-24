@@ -55,4 +55,37 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  @media (max-width: 767px) {
+    table thead {
+      display: none;
+    }
+
+    table, tbody, tr, td {
+      display: block;
+      width: 100%;
+    }
+
+    table tr {
+      padding: 1rem;
+    }
+
+    table td {
+      display: grid;
+      grid-template-columns: 7.5rem minmax(0, 1fr);
+      gap: 0.75rem;
+      max-width: none;
+      padding: 0.5rem 0;
+      text-align: left;
+    }
+
+    table td::before {
+      color: hsl(var(--muted-foreground));
+      content: attr(data-label);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+  }
 }

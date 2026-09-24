@@ -12,7 +12,8 @@ const CAMPOS = [
   { key: "carrera", label: "Carrera" },
   { key: "modulo", label: "Módulo" },
   { key: "horarioClase", label: "Horario" },
-  { key: "nombreModulo", label: "Nombre del módulo" },
+  { key: "semestre", label: "Semestre" },
+  { key: "corte", label: "Corte" },
 ]
 
 export function SearchFilters({ valores }: { valores: Record<string, string> }) {

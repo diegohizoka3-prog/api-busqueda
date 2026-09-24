@@ -3,17 +3,25 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { SearchHero } from "@/components/search-hero"
-import { getEstadisticas } from "@/lib/api"
+import { RegistrosTable } from "@/components/registros-table"
+import { getEstadisticas, getRegistros } from "@/lib/api"
 
 export const revalidate = 60
 
 export default async function Home() {
   let stats = { totalRegistros: 0, totalSalones: 0, totalProfesores: 0, totalCarreras: 0 }
+  let registrosCorte: Awaited<ReturnType<typeof getRegistros>> = []
 
   try {
     stats = await getEstadisticas()
   } catch {
     // La página sigue siendo útil aunque la API aún no esté disponible.
+  }
+
+  try {
+    registrosCorte = (await getRegistros({ corte: "Corte 6" })).slice(0, 5)
+  } catch {
+    // La tabla se omite si la API aún no está disponible.
   }
 
   const statCards = [
@@ -45,6 +53,11 @@ export default async function Home() {
       <section className="py-12">
         <h2 className="mb-6 text-2xl font-semibold">Explora</h2>
         <div className="grid gap-4 md:grid-cols-2">{exploreCards.map((item) => <Link key={item.href} href={item.href}><Card className="h-full transition-colors hover:border-primary/50"><CardContent className="flex items-start gap-4 p-6"><item.icon className="mt-1 h-8 w-8" /><div className="flex-1"><h3 className="mb-1 font-semibold">{item.title}</h3><p className="text-sm text-muted-foreground">{item.description}</p></div><ArrowRight className="h-5 w-5 text-muted-foreground" /></CardContent></Card></Link>)}</div>
+      </section>
+
+      <section className="py-12">
+        <div className="mb-6 flex items-end justify-between gap-4"><div><h2 className="text-2xl font-semibold">Corte 6</h2><p className="text-sm text-muted-foreground">Registros recientes del corte académico.</p></div><Link className="text-sm font-medium hover:underline" href="/buscar?corte=Corte+6">Ver todos</Link></div>
+        <RegistrosTable registros={registrosCorte} />
       </section>
 
       <section className="py-20"><Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent"><CardContent className="p-12 text-center"><h2 className="mb-4 text-3xl font-bold">¿Listo para buscar?</h2><p className="mx-auto mb-6 max-w-lg text-muted-foreground">Accede a la búsqueda completa con filtros avanzados.</p><Link href="/buscar" className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90">Ir a buscar <ArrowRight className="h-4 w-4" /></Link></CardContent></Card></section>
