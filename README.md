@@ -1,34 +1,78 @@
 # api-busqueda
 
-API REST para buscar en datos academicos.
+API REST + frontend para consulta de registros académicos.
 
-## Uso local
+## URLs de producción
+
+- Backend: https://api-busqueda-ejehmqinu-diegohizoka3-1705.vercel.app
+- Swagger: https://api-busqueda-ejehmqinu-diegohizoka3-1705.vercel.app/api/v1/docs
+- Frontend: https://api-busqueda-2d1n0pzfg-diegohizoka3-1705.vercel.app
+
+## Estructura del proyecto
+
+- `api/` — backend Express
+- `src/` — lógica del motor de búsqueda, datos y persistencia
+- `web/` — frontend en Next.js
+- `vercel.json` — configuración del backend en Vercel
+- `scripts/` — utilidades de seed y carga de datos
+
+## Requisitos para desarrolladores
+
+### Backend (raíz)
 
 ```bash
 npm install
 npm start
 ```
 
-El servidor usa el puerto `3000` por defecto o `process.env.PORT`. La documentacion Swagger esta disponible en `/api/v1/docs`.
+El servidor usa el puerto `3000` o `process.env.PORT`. La documentación Swagger está en:
+
+- `/api/v1/docs`
+- `/api/v1/docs/`
+
+### Frontend (web)
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+La app corre en el puerto por defecto de Next.js y usa la variable `NEXT_PUBLIC_API_URL` para apuntar al backend.
 
 ## Endpoints principales
 
-- `GET /` devuelve el estado de la API.
-- `GET /docs` redirige a Swagger.
-- `GET /api/v1/docs/` abre la documentacion interactiva.
-- `GET /api/v1/health` comprueba la salud del servicio.
+- `GET /` — estado del servicio
+- `GET /api/v1/health` — comprobación de salud
+- `GET /api/v1/docs` — Swagger UI
+- `GET /api/v1/search` — búsqueda general
+- `GET /api/v1/estadisticas` — estadísticas
 
-## Registro JSON
+## Persistencia y DATABASE_URL
 
-Cada registro requiere `salon`, `profesor`, `carrera`, `modulo`, `horarioClase` y `nombreModulo`.
+La aplicación puede usar una base de datos externa si se configura `DATABASE_URL` en el entorno del backend.
 
-Los datos se almacenan en memoria y se pierden al reiniciar el proceso.
+Ejemplo:
+
+```bash
+export DATABASE_URL="postgresql://usuario:password@host:5432/dbname"
+```
+
+Si no se define, la app funciona en memoria para desarrollo local. Para producción en Vercel, añade la variable en el proyecto del backend.
 
 ## Despliegue
 
-### GitHub
+### Repositorio
 
-El repositorio remoto es `https://github.com/diegohizoka3-prog/api-busqueda.git`.
+https://github.com/diegohizoka3-prog/api-busqueda.git
+
+### Vercel
+
+- Backend: desplegado como proyecto raíz con `vercel.json`
+- Frontend: desplegado desde `web/`
+- Backend URL en entorno del frontend: `NEXT_PUBLIC_API_URL`
+
+### GitHub
 
 ```bash
 git add .
@@ -36,17 +80,6 @@ git commit -m "Preparar despliegue de api-busqueda"
 git push origin main
 ```
 
-### Vercel
+## Nota
 
-El archivo `api/index.js` expone la app Express y `vercel.json` conserva las rutas actuales. En Vercel, importa el repositorio de GitHub y usa estos valores:
-
-- Build command: dejar vacio.
-- Install command: `npm install`.
-- Output directory: dejar vacio.
-- Variable opcional: `DATABASE_URL` para activar PostgreSQL.
-
-Despues del despliegue, las rutas quedan disponibles en:
-
-- `https://TU-DOMINIO.vercel.app/`
-- `https://TU-DOMINIO.vercel.app/docs`
-- `https://TU-DOMINIO.vercel.app/api/v1/docs/`
+El backend y el frontend están separados en Vercel, con el frontend apuntando al backend público mediante la variable de entorno `NEXT_PUBLIC_API_URL`.

@@ -2,4 +2,7 @@ node_modules/
 .env
 .env.local
 test.xlsx
+export-headers.txt
+*.xlsx
 .DS_Store
+.vercel
