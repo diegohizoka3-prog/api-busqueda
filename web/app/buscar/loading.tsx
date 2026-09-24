@@ -1,0 +1,3 @@
+export default function Loading() {
+  return <div className="container mx-auto px-4 py-10"><div className="mb-8 h-10 w-48 animate-pulse rounded bg-muted" /><div className="grid gap-8 lg:grid-cols-[280px_1fr]"><div className="hidden h-96 animate-pulse rounded-lg bg-muted lg:block" /><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-48 animate-pulse rounded-lg bg-muted" />)}</div></div></div>
+}
