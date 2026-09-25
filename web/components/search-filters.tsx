@@ -37,7 +37,36 @@ export function SearchFilters({ valores }: { valores: Record<string, string> }) 
   return (
     <div className="space-y-4 rounded-lg border bg-card p-4">
       <div className="flex items-center justify-between"><h3 className="font-semibold">Filtros</h3><Button variant="ghost" size="sm" onClick={() => router.push("/buscar")}>Limpiar</Button></div>
-      {CAMPOS.map(({ key, label }) => <div key={key} className="space-y-2"><Label htmlFor={key} className="text-sm">{label}</Label>{key === "modalidad" ? <Select value={local[key] || "__empty__"} onValueChange={(value) => setLocal({ ...local, [key]: value === "__empty__" ? "" : value || "" })}><SelectTrigger id={key} className="w-full"><SelectValue placeholder="Seleccionar modalidad" /></SelectTrigger><SelectContent><SelectItem value="__empty__">(vacío)</SelectItem><SelectItem value="Presencial">Presencial</SelectItem><SelectItem value="Intensiva">Intensiva</SelectItem><SelectItem value="Semipresencial">Semipresencial</SelectItem><SelectItem value="Nocturna">Nocturna</SelectItem></SelectContent></Select> : <Input id={key} value={local[key] || ""} onChange={(event) => setLocal({ ...local, [key]: event.target.value })} placeholder={`Filtrar por ${label.toLowerCase()}`} />}</div>)}
+      {CAMPOS.map(({ key, label }) => key === "modalidad" ? (
+        <div key={key} className="space-y-2">
+          <Label htmlFor="modalidad">Modalidad</Label>
+          <Select
+            value={local.modalidad || 'todas'}
+            onValueChange={(value) => {
+              if (value === 'todas') {
+                setLocal({ ...local, modalidad: '' })
+              } else {
+                setLocal({ ...local, modalidad: value || '' })
+              }
+            }}
+          >
+            <SelectTrigger id="modalidad">
+              <SelectValue placeholder="Todas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Todas</SelectItem>
+              <SelectItem value="Presencial">Presencial</SelectItem>
+              <SelectItem value="Intensiva">Intensiva</SelectItem>
+              <SelectItem value="Semipresencial">Semipresencial</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ) : (
+        <div key={key} className="space-y-2">
+          <Label htmlFor={key} className="text-sm">{label}</Label>
+          <Input id={key} value={local[key] || ""} onChange={(event) => setLocal({ ...local, [key]: event.target.value })} placeholder={`Filtrar por ${label.toLowerCase()}`} />
+        </div>
+      ))}
       <Button className="w-full" onClick={aplicar}>Aplicar filtros</Button>
     </div>
   )
