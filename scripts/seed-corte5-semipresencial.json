@@ -1,0 +1,7 @@
+[
+  {"salon":"Aula 3A","horarioClase":"7:00 PM - 9:00 PM - NOCTURNA","carrera":"Farmacia","modalidad":"Semipresencial","semestre":"3 SEM INT","corte":"Corte 5","modulo":"Mod#5","codigoModulo":"E-PRIAUX","nombreModulo":"PRIMEROS AUXILIOS","profesor":""},
+  {"salon":"Sistemas 2","horarioClase":"7:00 PM - 9:00 PM - NOCTURNA","carrera":"Admon de Empresas-RRHH-Salud","modalidad":"Semipresencial","semestre":"4 SEM INT","corte":"Corte 5","modulo":"Mod#3","codigoModulo":"E-SOADMI","nombreModulo":"SOFTWARE ADMINISTRATIVO I","profesor":"Cristian Aroca"},
+  {"salon":"Sin Aula","horarioClase":"7:00 PM - 9:00 PM - NOCTURNA","carrera":"Seguridad Ocupacional","modalidad":"Semipresencial","semestre":"3 SEM INT","corte":"Corte 5","modulo":"Mod#2","codigoModulo":"","nombreModulo":"PASAN SÁBADO","profesor":""},
+  {"salon":"Sin Aula","horarioClase":"7:00 PM - 9:00 PM - NOCTURNA","carrera":"Inglés Técnico Niveles","modalidad":"Semipresencial","semestre":"COMBI SEM","corte":"Corte 5","modulo":"Mod#1","codigoModulo":"","nombreModulo":"NIVEL 2 (VIRTUAL)","profesor":"José Tara"},
+  {"salon":"Sin Aula","horarioClase":"7:00 PM - 9:00 PM - NOCTURNA","carrera":"Inglés Técnico Niveles","modalidad":"Semipresencial","semestre":"COMBI SEM","corte":"Corte 5","modulo":"Mod#1","codigoModulo":"","nombreModulo":"NIVEL 2 (VIRTUAL)","profesor":"Yeison Yepes"}
+]
