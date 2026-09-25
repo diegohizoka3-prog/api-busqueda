@@ -4,6 +4,7 @@ const { CAMPOS, crearRegistro, obtenerRegistros, obtenerPorId, actualizarRegistr
 const { buscar } = require('./buscador');
 const { obtenerEstadisticas } = require('./estadisticas');
 const { saveData } = require('./persistencia');
+const { login, verificarToken, COOKIE_NAME } = require('./auth');
 
 const router = express.Router();
 const estado = {
@@ -62,7 +63,30 @@ router.get('/exportar-excel', (req, res, next) => {
   }
 });
 
-router.post('/registros', async (req, res, next) => {
+router.post('/auth/login', (req, res) => {
+  const { usuario, password } = req.body;
+  if (!usuario || !password) return res.status(400).json({ error: 'Usuario y password requeridos' });
+
+  const token = login(usuario, password);
+  if (!token) return res.status(401).json({ error: 'Credenciales inválidas' });
+
+  res.cookie(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+  return res.json({ ok: true, user: usuario });
+});
+
+router.post('/auth/logout', (req, res) => {
+  res.clearCookie(COOKIE_NAME);
+  return res.json({ ok: true });
+});
+
+router.get('/auth/me', verificarToken, (req, res) => res.json({ user: req.admin.user, role: req.admin.role }));
+
+router.post('/registros', verificarToken, async (req, res, next) => {
   try {
     const registro = crearRegistro(req.body);
     await guardarEstado();
@@ -73,7 +97,7 @@ router.post('/registros', async (req, res, next) => {
   }
 });
 
-router.put('/registros/:id', async (req, res, next) => {
+router.put('/registros/:id', verificarToken, async (req, res, next) => {
   try {
     const registro = actualizarRegistro(req.params.id, req.body);
     if (!registro) return res.status(404).json({ error: 'Registro no encontrado.' });
@@ -85,7 +109,7 @@ router.put('/registros/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/registros/:id', async (req, res, next) => {
+router.delete('/registros/:id', verificarToken, async (req, res, next) => {
   const registro = eliminarRegistro(req.params.id);
   if (!registro) return res.status(404).json({ error: 'Registro no encontrado.' });
   try {
@@ -97,7 +121,7 @@ router.delete('/registros/:id', async (req, res, next) => {
   }
 });
 
-router.post('/importar-excel', async (req, res, next) => {
+router.post('/importar-excel', verificarToken, async (req, res, next) => {
   try {
     const lista = Array.isArray(req.body) ? req.body : req.body.registros;
     const importados = importarRegistros(lista);
