@@ -76,7 +76,7 @@ router.post('/auth/login', (req, res) => {
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
-  return res.json({ ok: true, user: usuario });
+  return res.json({ ok: true, user: usuario, token });
 });
 
 router.post('/auth/logout', (req, res) => {

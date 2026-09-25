@@ -4,7 +4,10 @@ import type { Registro } from './types'
 import { API_URL } from './api'
 
 async function request(path: string, options: RequestInit = {}) {
-  const response = await fetch(`${API_URL}${path}`, { ...options, credentials: 'include' })
+  const headers = new Headers(options.headers)
+  const token = sessionStorage.getItem('admin_token')
+  if (token) headers.set('x-admin-token', token)
+  const response = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' })
   if (!response.ok) {
     const body = await response.json().catch(() => ({}))
     throw new Error(body.error || 'Error de autenticación')
@@ -17,11 +20,14 @@ export function login(usuario: string, password: string) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ usuario, password }),
+  }).then((result) => {
+    if (result.token) sessionStorage.setItem('admin_token', result.token)
+    return result
   })
 }
 
 export function logout() {
-  return request('/api/v1/auth/logout', { method: 'POST' })
+  return request('/api/v1/auth/logout', { method: 'POST' }).finally(() => sessionStorage.removeItem('admin_token'))
 }
 
 export function getMe() {
