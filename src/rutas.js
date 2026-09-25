@@ -100,7 +100,7 @@ router.post('/importar-excel', (req, res, next) => {
 });
 
 const parametrosBusqueda = [
-  'q', 'salon', 'profesor', 'carrera', 'modulo', 'horarioClase', 'nombreModulo', 'semestre', 'corte'
+  'q', 'salon', 'profesor', 'carrera', 'modulo', 'horarioClase', 'nombreModulo', 'semestre', 'corte', 'modalidad'
 ].map((nombre) => ({
   name: nombre,
   in: 'query',
@@ -144,7 +144,7 @@ const swaggerDocument = {
     schemas: {
       Registro: {
         type: 'object', required: ['salon', 'carrera', 'modulo', 'horarioClase', 'nombreModulo'],
-        properties: { id: { type: 'integer' }, ...Object.fromEntries(CAMPOS.map((campo) => [campo, { type: 'string' }])), semestre: { type: 'string' }, corte: { type: 'string' }, codigoModulo: { type: 'string' } }
+        properties: { id: { type: 'integer' }, ...Object.fromEntries(CAMPOS.map((campo) => [campo, { type: 'string' }])), semestre: { type: 'string' }, corte: { type: 'string' }, codigoModulo: { type: 'string' }, modalidad: { type: 'string' } }
       }
     }
   },

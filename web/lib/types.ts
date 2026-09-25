@@ -9,6 +9,7 @@ export interface Registro {
   semestre?: string
   corte?: string
   codigoModulo?: string
+  modalidad?: string
 }
 
 export interface Estadisticas {

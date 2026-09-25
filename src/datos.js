@@ -7,10 +7,11 @@ const CAMPOS = [
   'nombreModulo',
   'semestre',
   'corte',
-  'codigoModulo'
+  'codigoModulo',
+  'modalidad'
 ];
 
-const CAMPOS_REQUERIDOS = ['salon', 'carrera', 'modulo', 'horarioClase', 'nombreModulo'];
+const CAMPOS_REQUERIDOS = ['salon', 'carrera', 'horarioClase', 'nombreModulo'];
 
 let registros = [];
 let siguienteId = 1;

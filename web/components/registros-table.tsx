@@ -17,7 +17,7 @@ export function RegistrosTable({ registros }: Props) {
         <table className="w-full border-collapse text-left">
           <thead className="sticky top-0 bg-muted/50">
             <tr>
-              {['AULA', 'HORARIO', 'PROGRAMA', 'SEMESTRE', 'CORTE #', 'MÓDULO', 'NOMBRE DEL MÓDULO', 'DOCENTE'].map((heading) => (
+              {['AULA', 'HORARIO', 'PROGRAMA', 'MODALIDAD', 'SEMESTRE', 'CORTE #', 'MÓDULO', 'NOMBRE DEL MÓDULO', 'DOCENTE'].map((heading) => (
                 <th key={heading} className={`whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase ${heading === 'SEMESTRE' || heading === 'CORTE #' || heading === 'MÓDULO' ? 'text-center' : ''}`}>
                   {heading}
                 </th>
@@ -30,6 +30,7 @@ export function RegistrosTable({ registros }: Props) {
                 <td data-label="AULA" className="px-4 py-3 text-sm"><Link className="hover:underline" href={`/registros/${registro.id}`}>{valor(registro.salon)}</Link></td>
                 <td data-label="HORARIO" className="px-4 py-3 text-sm">{valor(registro.horarioClase)}</td>
                 <td data-label="PROGRAMA" className="px-4 py-3 text-sm">{valor(registro.carrera)}</td>
+                <td data-label="MODALIDAD" className="px-4 py-3 text-sm">{valor(registro.modalidad)}</td>
                 <td data-label="SEMESTRE" className="px-4 py-3 text-center text-sm">{valor(registro.semestre)}</td>
                 <td data-label="CORTE #" className="px-4 py-3 text-center text-sm">{valor(registro.corte)}</td>
                 <td data-label="MÓDULO" className="px-4 py-3 text-center text-sm">{valor(registro.modulo)}</td>
