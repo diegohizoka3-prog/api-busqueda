@@ -10,7 +10,7 @@ import { Toaster } from "@/components/ui/sonner"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "api-busqueda",
+  title: "Catálogo Académico",
   description: "Búsqueda académica de salones, profesores, carreras y módulos",
 }
 

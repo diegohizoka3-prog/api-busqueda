@@ -17,7 +17,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold"><Search className="h-5 w-5" /><span>api-busqueda</span></Link>
+        <Link href="/" className="flex items-center gap-2 font-semibold"><Search className="h-5 w-5" /><span>Catálogo Académico</span></Link>
         <nav className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => <Link key={link.href} href={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">{link.label}</Link>)}
         </nav>
