@@ -11,8 +11,13 @@ const estado = {
   cargar: (registros) => registros.forEach(({ id, created_at, ...datos }) => crearRegistro(datos))
 };
 
-function guardarEstado() {
-  saveData(estado).catch((error) => console.warn('Persistencia no disponible:', error.message));
+async function guardarEstado() {
+  try {
+    await saveData(estado);
+  } catch (error) {
+    console.error('Error al guardar en PostgreSQL:', error.message);
+    throw error;
+  }
 }
 
 function listaUnica(campo) {
@@ -57,10 +62,10 @@ router.get('/exportar-excel', (req, res, next) => {
   }
 });
 
-router.post('/registros', (req, res, next) => {
+router.post('/registros', async (req, res, next) => {
   try {
     const registro = crearRegistro(req.body);
-    guardarEstado();
+    await guardarEstado();
     return res.status(201).json(registro);
   } catch (error) {
     error.status = 400;
@@ -68,11 +73,11 @@ router.post('/registros', (req, res, next) => {
   }
 });
 
-router.put('/registros/:id', (req, res, next) => {
+router.put('/registros/:id', async (req, res, next) => {
   try {
     const registro = actualizarRegistro(req.params.id, req.body);
     if (!registro) return res.status(404).json({ error: 'Registro no encontrado.' });
-    guardarEstado();
+    await guardarEstado();
     return res.json(registro);
   } catch (error) {
     error.status = 400;
@@ -80,18 +85,23 @@ router.put('/registros/:id', (req, res, next) => {
   }
 });
 
-router.delete('/registros/:id', (req, res) => {
+router.delete('/registros/:id', async (req, res, next) => {
   const registro = eliminarRegistro(req.params.id);
   if (!registro) return res.status(404).json({ error: 'Registro no encontrado.' });
-  guardarEstado();
-  return res.json({ mensaje: 'Registro eliminado.', registro });
+  try {
+    await guardarEstado();
+    return res.json({ mensaje: 'Registro eliminado.', registro });
+  } catch (error) {
+    error.status = 400;
+    return next(error);
+  }
 });
 
-router.post('/importar-excel', (req, res, next) => {
+router.post('/importar-excel', async (req, res, next) => {
   try {
     const lista = Array.isArray(req.body) ? req.body : req.body.registros;
     const importados = importarRegistros(lista);
-    guardarEstado();
+    await guardarEstado();
     return res.status(201).json({ importados: importados.length });
   } catch (error) {
     error.status = 400;

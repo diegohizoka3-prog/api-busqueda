@@ -28,6 +28,10 @@ async function initTable() {
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
+      await database.query(`
+        ALTER TABLE registros
+        ADD COLUMN IF NOT EXISTS modalidad TEXT
+      `);
   } catch (error) {
     console.warn('No se pudo inicializar PostgreSQL:', error.message);
   }
@@ -39,7 +43,7 @@ async function loadData(state) {
 
   try {
     const { rows } = await database.query(`
-      SELECT id, salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, "codigoModulo", created_at
+      SELECT id, salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, "codigoModulo", modalidad, created_at
       FROM registros
       ORDER BY id
     `);
@@ -59,14 +63,14 @@ async function saveData(state) {
     await client.query('DELETE FROM registros');
     for (const registro of state.obtener()) {
       await client.query(`
-        INSERT INTO registros (salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, "codigoModulo")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      `, [registro.salon, registro.profesor, registro.carrera, registro.modulo, registro.horarioClase, registro.nombreModulo, registro.semestre, registro.corte, registro.codigoModulo]);
+        INSERT INTO registros (salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, "codigoModulo", modalidad)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `, [registro.salon, registro.profesor, registro.carrera, registro.modulo, registro.horarioClase, registro.nombreModulo, registro.semestre || null, registro.corte || null, registro.codigoModulo || null, registro.modalidad || null]);
     }
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
-    console.warn('No se pudieron guardar los registros en PostgreSQL:', error.message);
+    throw error;
   } finally {
     client.release();
   }
