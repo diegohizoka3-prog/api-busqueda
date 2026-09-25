@@ -2,21 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-  main.bg-slate-50 table {
-    color: hsl(var(--foreground));
-  }
-
-  main.bg-slate-50 table thead {
-    background-color: hsl(var(--muted) / 0.5);
-    color: hsl(var(--foreground));
-  }
-
-  main.bg-slate-50 table td .text-slate-500 {
-    color: hsl(var(--muted-foreground));
-  }
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;

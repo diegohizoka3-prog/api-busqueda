@@ -2,12 +2,13 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import * as XLSX from "xlsx"
-import { Download, FileSpreadsheet, LogOut, Pencil, Plus, Search, ShieldCheck, Trash2, Upload, X } from "lucide-react"
+import { Download, FileSpreadsheet, LogOut, Plus, Search, ShieldCheck, Upload, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import type { Registro } from "@/lib/types"
 import { actualizarRegistro, crearRegistro, eliminarRegistro, getAdminRegistros, getMe, importarRegistros, logout } from "@/lib/auth"
 import { exportarExcelURL } from "@/lib/api"
+import { AdminRecordsTable } from "@/components/admin-records-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -54,10 +55,7 @@ export function AdminPanel() {
     load().catch(() => router.replace("/admin/login")).finally(() => setLoading(false))
   }, [router])
 
-  const visibles = registros.filter((registro) => {
-    const text = Object.values(registro).join(" ").toLowerCase()
-    return text.includes(query.trim().toLowerCase())
-  })
+  const visibles = registros.filter((registro) => Object.values(registro).join(" ").toLowerCase().includes(query.trim().toLowerCase()))
 
   function openCreate() {
     setEditing(null)
@@ -135,7 +133,7 @@ export function AdminPanel() {
 
         <Card className="border-slate-200 bg-white shadow-sm">
           <CardHeader className="gap-4 border-b border-slate-100 sm:flex-row sm:items-center sm:justify-between"><div><CardTitle>Registros académicos</CardTitle><CardDescription>{visibles.length} visibles de {registros.length} registros</CardDescription></div><div className="flex flex-wrap gap-2"><Button onClick={openCreate}><Plus className="mr-2 size-4" />Crear registro</Button><Button variant="outline" onClick={() => setImportOpen(true)}><Upload className="mr-2 size-4" />Importar Excel</Button><a className="inline-flex h-8 items-center justify-center gap-2 rounded-lg border border-input bg-transparent px-3 text-sm font-medium whitespace-nowrap transition-colors hover:bg-accent hover:text-accent-foreground" href={exportarExcelURL()} download><Download className="size-4" />Exportar</a></div></CardHeader>
-          <CardContent className="space-y-4 p-4 sm:p-6"><div className="relative max-w-md"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-9" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar registros..." /></div><div className="overflow-hidden rounded-lg border border-slate-200"><div className="overflow-x-auto"><table className="w-full min-w-[1100px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase text-slate-500"><tr>{["ID", "Aula", "Programa", "Modalidad", "Semestre", "Corte", "Módulo", "Docente", "Acciones"].map((heading) => <th className="whitespace-nowrap px-4 py-3 font-semibold" key={heading}>{heading}</th>)}</tr></thead><tbody>{visibles.map((registro) => <tr className="border-t border-slate-100 hover:bg-slate-50" key={registro.id}><td className="px-4 py-3 font-mono text-xs text-slate-500">{registro.id}</td><td className="px-4 py-3 font-medium">{registro.salon || "—"}<div className="mt-1 text-xs text-slate-500">{registro.horarioClase}</div></td><td className="px-4 py-3">{registro.carrera}</td><td className="px-4 py-3">{registro.modalidad || "—"}</td><td className="px-4 py-3">{registro.semestre || "—"}</td><td className="px-4 py-3">{registro.corte || "—"}</td><td className="max-w-xs px-4 py-3"><div className="truncate" title={registro.nombreModulo}>{registro.nombreModulo}</div><div className="mt-1 text-xs text-slate-500">{registro.modulo || "—"}</div></td><td className="px-4 py-3">{registro.profesor || "—"}</td><td className="px-4 py-3"><div className="flex gap-1"><Button variant="ghost" size="icon" aria-label={`Editar ${registro.id}`} title="Editar" onClick={() => openEdit(registro)}><Pencil className="size-4" /></Button><Button variant="ghost" size="icon" aria-label={`Eliminar ${registro.id}`} title="Eliminar" className="text-red-600 hover:text-red-700" onClick={() => remove(registro)}><Trash2 className="size-4" /></Button></div></td></tr>)}</tbody></table>{visibles.length === 0 && <div className="p-12 text-center text-sm text-muted-foreground">No hay registros que coincidan.</div>}</div></div></CardContent>
+          <CardContent className="space-y-4 p-4 sm:p-6"><div className="relative max-w-md"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-9" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar registros..." /></div><AdminRecordsTable registros={visibles} onEdit={openEdit} onDelete={remove} /></CardContent>
         </Card>
       </div>
 
