@@ -1,14 +1,12 @@
 const CAMPOS = [
   'salon',
-  'profesor',
-  'carrera',
-  'modulo',
   'horarioClase',
-  'nombreModulo',
+  'carrera',
+  'modalidad',
   'semestre',
   'corte',
-  'codigoModulo',
-  'modalidad'
+  'modulo',
+  'nombreModulo'
 ];
 
 const CAMPOS_REQUERIDOS = ['salon', 'carrera', 'horarioClase', 'nombreModulo'];
@@ -61,6 +59,7 @@ function eliminarRegistro(id) {
 
 function importarRegistros(lista) {
   if (!Array.isArray(lista)) throw new Error('El cuerpo debe ser un array de registros.');
+  lista.forEach(validarRegistro);
   return lista.map(crearRegistro);
 }
 

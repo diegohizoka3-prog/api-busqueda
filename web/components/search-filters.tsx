@@ -9,10 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const CAMPOS = [
   { key: "salon", label: "Salón" },
-  { key: "profesor", label: "Profesor" },
   { key: "carrera", label: "Carrera" },
   { key: "modalidad", label: "Modalidad" },
   { key: "modulo", label: "Módulo" },
+  { key: "nombreModulo", label: "Nombre del módulo" },
   { key: "horarioClase", label: "Horario" },
   { key: "semestre", label: "Semestre" },
   { key: "corte", label: "Corte" },

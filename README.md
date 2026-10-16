@@ -4,9 +4,10 @@ API REST + frontend para consulta de registros académicos.
 
 ## URLs de producción
 
-- Backend: https://api-busqueda-ejehmqinu-diegohizoka3-1705.vercel.app
-- Swagger: https://api-busqueda-ejehmqinu-diegohizoka3-1705.vercel.app/api/v1/docs
-- Frontend: https://api-busqueda-2d1n0pzfg-diegohizoka3-1705.vercel.app
+- Frontend limpio: https://api-busqueda-web.vercel.app
+- Backend limpio: https://api-busqueda-api.vercel.app
+- Swagger: https://api-busqueda-api.vercel.app/api/v1/docs/
+- Frontend alternativo: https://api-busqueda-web.vercel.app/buscar
 
 ## Estructura del proyecto
 

@@ -1,21 +1,19 @@
 export interface Registro {
   id: number
   salon: string
-  profesor: string
-  carrera: string
-  modulo: string
   horarioClase: string
-  nombreModulo: string
+  carrera: string
+  modalidad: string
   semestre?: string
   corte?: string
-  codigoModulo?: string
-  modalidad?: string
+  modulo: string
+  nombreModulo: string
 }
 
 export interface Estadisticas {
   totalRegistros: number
-  totalSalones: number
-  totalProfesores: number
-  totalCarreras: number
+  totalAulas: number
+  totalProgramas: number
+  totalModulos: number
   distribucion?: Record<string, Record<string, number>>
 }

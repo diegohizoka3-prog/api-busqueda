@@ -17,21 +17,19 @@ async function initTable() {
       CREATE TABLE IF NOT EXISTS registros (
         id SERIAL PRIMARY KEY,
         salon TEXT,
-        profesor TEXT,
-        carrera TEXT,
-        modulo TEXT,
         "horarioClase" TEXT,
-        "nombreModulo" TEXT,
+        carrera TEXT,
+        modalidad TEXT,
         semestre TEXT,
         corte TEXT,
-        "codigoModulo" TEXT,
+        modulo TEXT,
+        "nombreModulo" TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
-      await database.query(`
-        ALTER TABLE registros
-        ADD COLUMN IF NOT EXISTS modalidad TEXT
-      `);
+    await database.query('ALTER TABLE registros DROP COLUMN IF EXISTS profesor');
+    await database.query('ALTER TABLE registros DROP COLUMN IF EXISTS "codigoModulo"');
+    await database.query('ALTER TABLE registros ADD COLUMN IF NOT EXISTS modalidad TEXT');
   } catch (error) {
     console.warn('No se pudo inicializar PostgreSQL:', error.message);
   }
@@ -43,7 +41,7 @@ async function loadData(state) {
 
   try {
     const { rows } = await database.query(`
-      SELECT id, salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, "codigoModulo", modalidad, created_at
+      SELECT id, salon, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, modalidad, created_at
       FROM registros
       ORDER BY id
     `);
@@ -63,9 +61,9 @@ async function saveData(state) {
     await client.query('DELETE FROM registros');
     for (const registro of state.obtener()) {
       await client.query(`
-        INSERT INTO registros (salon, profesor, carrera, modulo, "horarioClase", "nombreModulo", semestre, corte, "codigoModulo", modalidad)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      `, [registro.salon, registro.profesor, registro.carrera, registro.modulo, registro.horarioClase, registro.nombreModulo, registro.semestre || null, registro.corte || null, registro.codigoModulo || null, registro.modalidad || null]);
+        INSERT INTO registros (salon, "horarioClase", carrera, modalidad, semestre, corte, modulo, "nombreModulo")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [registro.salon, registro.horarioClase, registro.carrera, registro.modalidad || null, registro.semestre || null, registro.corte || null, registro.modulo, registro.nombreModulo]);
     }
     await client.query('COMMIT');
   } catch (error) {

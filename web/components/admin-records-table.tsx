@@ -15,10 +15,10 @@ const valor = (value?: string) => value?.trim() || "—"
 export function AdminRecordsTable({ registros, onEdit, onDelete }: Props) {
   return (
     <div className="overflow-x-auto rounded-lg border border-neutral-200">
-      <table className="w-full min-w-[1200px] text-sm">
+      <table className="w-full min-w-[1050px] text-sm">
         <thead className="border-b border-neutral-200 bg-neutral-100">
           <tr>
-            {["ID", "AULA", "HORARIO", "PROGRAMA", "MODALIDAD", "SEMESTRE", "CORTE", "MÓDULO", "NOMBRE DEL MÓDULO", "DOCENTE", "ACCIONES"].map((heading) => (
+            {["ID", "AULA", "HORARIO", "PROGRAMA", "MODALIDAD", "SEMESTRE", "CORTE #", "MÓDULO", "NOMBRE DEL MÓDULO", "ACCIONES"].map((heading) => (
               <th key={heading} className="whitespace-nowrap px-4 py-3 text-left font-semibold text-neutral-900">{heading}</th>
             ))}
           </tr>
@@ -35,7 +35,6 @@ export function AdminRecordsTable({ registros, onEdit, onDelete }: Props) {
               <td className="px-4 py-3 text-neutral-900">{valor(registro.corte)}</td>
               <td className="px-4 py-3 text-neutral-900">{valor(registro.modulo)}</td>
               <td className="max-w-xs truncate px-4 py-3 text-neutral-900" title={valor(registro.nombreModulo)}>{valor(registro.nombreModulo)}</td>
-              <td className="px-4 py-3 text-neutral-900">{valor(registro.profesor)}</td>
               <td className="px-4 py-3 text-center">
                 <div className="flex justify-center gap-2">
                   <Button variant="ghost" size="icon" onClick={() => onEdit(registro)} className="text-blue-600 hover:text-blue-700" title="Editar" aria-label={`Editar ${registro.id}`}><Pencil className="h-4 w-4" /></Button>

@@ -17,16 +17,24 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 const campos = [
-  ["salon", "Salón"], ["horarioClase", "Horario"], ["carrera", "Carrera"], ["modalidad", "Modalidad"],
-  ["semestre", "Semestre"], ["corte", "Corte"], ["modulo", "Módulo"], ["codigoModulo", "Código del módulo"],
-  ["nombreModulo", "Nombre del módulo"], ["profesor", "Profesor"],
+  ["salon", "Aula"], ["horarioClase", "Horario"], ["carrera", "Programa"], ["modalidad", "Modalidad"],
+  ["semestre", "Semestre"], ["corte", "Corte #"], ["modulo", "Módulo"], ["nombreModulo", "Nombre del módulo"],
 ] as const
 
 type RegistroForm = Omit<Registro, "id">
 
 const emptyForm: RegistroForm = {
-  salon: "", horarioClase: "", carrera: "", modalidad: "", semestre: "", corte: "", modulo: "", codigoModulo: "", nombreModulo: "", profesor: "",
+  salon: "", horarioClase: "", carrera: "", modalidad: "", semestre: "", corte: "", modulo: "", nombreModulo: "",
 }
+
+function normalizarEncabezado(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+const camposImportables = new Map(campos.flatMap(([key, label]) => [
+  [normalizarEncabezado(key), key],
+  [normalizarEncabezado(label), key],
+]))
 
 function formFromRegistro(registro: Registro): RegistroForm {
   return Object.fromEntries(campos.map(([key]) => [key, registro[key] || ""])) as RegistroForm
@@ -103,7 +111,14 @@ export function AdminPanel() {
       const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" })
       const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
       const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(firstSheet, { defval: "" })
-      const data = rows.map((row) => Object.fromEntries(campos.map(([key]) => [key, String(row[key] ?? "")])) as RegistroForm)
+      const data = rows.map((row) => {
+        const registro: Partial<RegistroForm> = {}
+        for (const [heading, value] of Object.entries(row)) {
+          const key = camposImportables.get(normalizarEncabezado(heading))
+          if (key) registro[key] = String(value ?? "")
+        }
+        return registro as RegistroForm
+      })
       const result = await importarRegistros(data)
       await load()
       setImportOpen(false)
@@ -139,7 +154,7 @@ export function AdminPanel() {
 
       <Dialog open={formOpen} onOpenChange={setFormOpen}><DialogContent className="max-w-3xl"><DialogHeader><DialogTitle>{editing ? "Editar registro" : "Crear registro"}</DialogTitle><DialogDescription>Completa la información del registro académico.</DialogDescription></DialogHeader><form onSubmit={save} className="grid max-h-[65vh] gap-4 overflow-y-auto py-2 sm:grid-cols-2">{campos.map(([key, label]) => <div className="space-y-2" key={key}><Label htmlFor={`admin-${key}`}>{label}</Label><Input id={`admin-${key}`} value={form[key]} onChange={(event) => setForm({ ...form, [key]: event.target.value })} required={key === "salon" || key === "carrera" || key === "horarioClase" || key === "nombreModulo"} /></div>)}<DialogFooter className="sm:col-span-2"><Button type="button" variant="outline" onClick={() => setFormOpen(false)}>Cancelar</Button><Button type="submit" disabled={saving}>{saving ? "Guardando..." : "Guardar registro"}</Button></DialogFooter></form></DialogContent></Dialog>
 
-      <Dialog open={importOpen} onOpenChange={setImportOpen}><DialogContent><DialogHeader><DialogTitle>Importar Excel</DialogTitle><DialogDescription>Sube un archivo .xlsx, .xls o .json con los encabezados del catálogo.</DialogDescription></DialogHeader><div className="space-y-4"><div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center"><FileSpreadsheet className="mx-auto mb-3 size-8 text-slate-500" /><Input className="mx-auto max-w-sm bg-white" type="file" accept=".xlsx,.xls,.json" onChange={(event: ChangeEvent<HTMLInputElement>) => setFile(event.target.files?.[0] || null)} />{file && <p className="mt-3 text-sm text-slate-600">{file.name}</p>}</div><DialogFooter><Button type="button" variant="outline" onClick={() => setImportOpen(false)}><X className="mr-2 size-4" />Cancelar</Button><Button type="button" disabled={!file || saving} onClick={importFile}>{saving ? "Importando..." : <><Upload className="mr-2 size-4" />Importar archivo</>}</Button></DialogFooter></div></DialogContent></Dialog>
+      <Dialog open={importOpen} onOpenChange={setImportOpen}><DialogContent><DialogHeader><DialogTitle>Importar Excel</DialogTitle><DialogDescription>Sube un archivo .xlsx, .xls o .json. Encabezados: AULA, HORARIO, PROGRAMA, MODALIDAD, SEMESTRE, CORTE #, MÓDULO y NOMBRE DEL MÓDULO.</DialogDescription></DialogHeader><div className="space-y-4"><div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center"><FileSpreadsheet className="mx-auto mb-3 size-8 text-slate-500" /><Input className="mx-auto max-w-sm bg-white" type="file" accept=".xlsx,.xls,.json" onChange={(event: ChangeEvent<HTMLInputElement>) => setFile(event.target.files?.[0] || null)} />{file && <p className="mt-3 text-sm text-slate-600">{file.name}</p>}</div><DialogFooter><Button type="button" variant="outline" onClick={() => setImportOpen(false)}><X className="mr-2 size-4" />Cancelar</Button><Button type="button" disabled={!file || saving} onClick={importFile}>{saving ? "Importando..." : <><Upload className="mr-2 size-4" />Importar archivo</>}</Button></DialogFooter></div></DialogContent></Dialog>
     </main>
   )
 }

@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, Database, GraduationCap, Sparkles, Users } from "lucide-react"
+import { ArrowRight, BookOpen, Building2, Database, GraduationCap, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,7 +9,7 @@ import { getEstadisticas, getRegistros } from "@/lib/api"
 export const revalidate = 60
 
 export default async function Home() {
-  let stats = { totalRegistros: 0, totalSalones: 0, totalProfesores: 0, totalCarreras: 0 }
+  let stats = { totalRegistros: 0, totalAulas: 0, totalProgramas: 0, totalModulos: 0 }
   let registrosCorte: Awaited<ReturnType<typeof getRegistros>> = []
 
   try {
@@ -26,15 +26,15 @@ export default async function Home() {
 
   const statCards = [
     { label: "Registros", value: stats.totalRegistros, icon: Database },
-    { label: "Salones", value: stats.totalSalones, icon: Building2 },
-    { label: "Profesores", value: stats.totalProfesores, icon: Users },
-    { label: "Carreras", value: stats.totalCarreras, icon: GraduationCap },
+    { label: "Aulas", value: stats.totalAulas, icon: Building2 },
+    { label: "Programas", value: stats.totalProgramas, icon: GraduationCap },
+    { label: "Módulos", value: stats.totalModulos, icon: BookOpen },
   ]
 
   const exploreCards = [
-    { href: "/buscar?tipo=profesor", title: "Profesores", description: "Busca por docente y ve sus módulos asignados.", icon: Users },
-    { href: "/buscar?tipo=carrera", title: "Carreras", description: "Explora módulos por carrera académica.", icon: GraduationCap },
-    { href: "/buscar?tipo=salon", title: "Salones", description: "Consulta los registros de cada salón.", icon: Building2 },
+    { href: "/buscar", title: "Programas", description: "Explora módulos por programa académico.", icon: GraduationCap },
+    { href: "/buscar", title: "Aulas", description: "Consulta los registros por aula.", icon: Building2 },
+    { href: "/buscar", title: "Módulos", description: "Encuentra los módulos del catálogo.", icon: BookOpen },
     { href: "/estadisticas", title: "Estadísticas", description: "Visualiza distribuciones y totales.", icon: Database },
   ]
 
@@ -44,7 +44,7 @@ export default async function Home() {
         <div className="absolute inset-0 -z-10 overflow-hidden"><div className="absolute left-1/2 top-1/4 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" /></div>
         <Badge variant="secondary" className="mb-6"><Sparkles className="mr-1 h-3 w-3" />Búsqueda académica</Badge>
         <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-7xl">Encuentra lo que buscas<br /><span className="text-muted-foreground">en segundos</span></h1>
-        <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl">Búsqueda instantánea en salones, profesores, carreras y módulos.</p>
+        <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl">Búsqueda instantánea en aulas, horarios, programas y módulos.</p>
         <div className="flex justify-center"><SearchHero /></div>
       </section>
 

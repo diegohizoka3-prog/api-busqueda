@@ -26,10 +26,19 @@ function listaUnica(campo) {
 }
 
 function crearExcel(registros) {
-  const columnas = ['id', ...CAMPOS];
-  const filas = registros.map((registro) => Object.fromEntries(columnas.map((columna) => [columna, registro[columna]])));
+  const encabezados = {
+    salon: 'AULA',
+    horarioClase: 'HORARIO',
+    carrera: 'PROGRAMA',
+    modalidad: 'MODALIDAD',
+    semestre: 'SEMESTRE',
+    corte: 'CORTE #',
+    modulo: 'MÓDULO',
+    nombreModulo: 'NOMBRE DEL MÓDULO'
+  };
+  const filas = registros.map((registro) => Object.fromEntries(CAMPOS.map((campo) => [encabezados[campo], registro[campo]])));
   const libro = XLSX.utils.book_new();
-  const hoja = XLSX.utils.json_to_sheet(filas, { header: columnas });
+  const hoja = XLSX.utils.json_to_sheet(filas, { header: CAMPOS.map((campo) => encabezados[campo]) });
   XLSX.utils.book_append_sheet(libro, hoja, 'Registros');
   return XLSX.write(libro, { type: 'buffer', bookType: 'xlsx' });
 }
@@ -37,8 +46,9 @@ function crearExcel(registros) {
 router.get('/health', (req, res) => res.json({
   status: 'ok', service: 'api-busqueda', version: '1.0.0', timestamp: new Date().toISOString()
 }));
+router.get('/aulas', (req, res) => res.json(listaUnica('salon')));
 router.get('/salones', (req, res) => res.json(listaUnica('salon')));
-router.get('/profesores', (req, res) => res.json(listaUnica('profesor')));
+router.get('/programas', (req, res) => res.json(listaUnica('carrera')));
 router.get('/carreras', (req, res) => res.json(listaUnica('carrera')));
 router.get('/modulos', (req, res) => res.json(listaUnica('modulo')));
 router.get('/registros', (req, res) => res.json(obtenerRegistros()));
@@ -134,7 +144,7 @@ router.post('/importar-excel', verificarToken, async (req, res, next) => {
 });
 
 const parametrosBusqueda = [
-  'q', 'salon', 'profesor', 'carrera', 'modulo', 'horarioClase', 'nombreModulo', 'semestre', 'corte', 'modalidad'
+  'q', ...CAMPOS
 ].map((nombre) => ({
   name: nombre,
   in: 'query',
@@ -151,10 +161,12 @@ const respuestaBusqueda = {
       example: [{
         id: 1,
         salon: 'A-101',
-        profesor: 'Ana Lopez',
         carrera: 'Ingenieria',
-        modulo: 'Matematicas',
         horarioClase: '08:00-10:00',
+        modalidad: 'Presencial',
+        semestre: '2026-1',
+        corte: 'Corte 1',
+        modulo: 'Matematicas',
         nombreModulo: 'Calculo I'
       }]
     }
@@ -177,13 +189,13 @@ const swaggerDocument = {
   components: {
     schemas: {
       Registro: {
-        type: 'object', required: ['salon', 'carrera', 'modulo', 'horarioClase', 'nombreModulo'],
-        properties: { id: { type: 'integer' }, ...Object.fromEntries(CAMPOS.map((campo) => [campo, { type: 'string' }])), semestre: { type: 'string' }, corte: { type: 'string' }, codigoModulo: { type: 'string' }, modalidad: { type: 'string' } }
+        type: 'object', required: ['salon', 'carrera', 'horarioClase', 'nombreModulo'],
+        properties: { id: { type: 'integer' }, ...Object.fromEntries(CAMPOS.map((campo) => [campo, { type: 'string' }])) }
       }
     }
   },
   paths: Object.fromEntries([
-    ['/health', ['get']], ['/salones', ['get']], ['/profesores', ['get']], ['/carreras', ['get']], ['/modulos', ['get']],
+    ['/health', ['get']], ['/aulas', ['get']], ['/salones', ['get']], ['/programas', ['get']], ['/carreras', ['get']], ['/modulos', ['get']],
     ['/registros', ['get', 'post']], ['/registros/{id}', ['get', 'put', 'delete']], ['/estadisticas', ['get']],
     ['/buscar', ['get']], ['/exportar-excel', ['get']], ['/importar-excel', ['post']]
   ].map(([path, metodos]) => [path, Object.fromEntries(metodos.map((metodo) => [metodo, {
