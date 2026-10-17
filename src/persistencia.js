@@ -74,4 +74,39 @@ async function saveData(state) {
   }
 }
 
-module.exports = { initTable, loadData, saveData };
+async function insertarRegistros(lista) {
+  const database = getPool();
+  if (!database) return null;
+
+  const client = await database.connect();
+  try {
+    await client.query('BEGIN');
+    const ids = [];
+    for (const registro of lista) {
+      const { rows } = await client.query(`
+        INSERT INTO registros (salon, "horarioClase", carrera, modalidad, semestre, corte, modulo, "nombreModulo")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING id
+      `, [
+        registro.salon,
+        registro.horarioClase,
+        registro.carrera,
+        registro.modalidad || null,
+        registro.semestre || null,
+        registro.corte || null,
+        registro.modulo || null,
+        registro.nombreModulo
+      ]);
+      ids.push(rows[0].id);
+    }
+    await client.query('COMMIT');
+    return ids;
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = { initTable, loadData, saveData, insertarRegistros };

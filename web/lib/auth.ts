@@ -58,10 +58,16 @@ export function eliminarRegistro(id: number) {
   return request(`/api/v1/registros/${id}`, { method: 'DELETE' })
 }
 
-export function importarRegistros(registros: Omit<Registro, 'id'>[]) {
+export interface ResultadoImportacion {
+  importados: number
+  omitidos: number
+  filasOmitidas: number[]
+}
+
+export function importarRegistros(datos: { headers: string[]; rows: unknown[][]; firstDataRow: number }): Promise<ResultadoImportacion> {
   return request('/api/v1/importar-excel', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(registros),
+    body: JSON.stringify(datos),
   })
 }

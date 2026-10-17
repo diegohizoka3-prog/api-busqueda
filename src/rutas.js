@@ -1,15 +1,15 @@
 const express = require('express');
 const XLSX = require('xlsx');
-const { CAMPOS, crearRegistro, obtenerRegistros, obtenerPorId, actualizarRegistro, eliminarRegistro, importarRegistros } = require('./datos');
+const { CAMPOS, crearRegistro, obtenerRegistros, obtenerPorId, actualizarRegistro, eliminarRegistro, prepararImportacion, registrarImportados, cargarRegistros } = require('./datos');
 const { buscar } = require('./buscador');
 const { obtenerEstadisticas } = require('./estadisticas');
-const { saveData } = require('./persistencia');
+const { saveData, insertarRegistros } = require('./persistencia');
 const { login, verificarToken, COOKIE_NAME } = require('./auth');
 
 const router = express.Router();
 const estado = {
   obtener: obtenerRegistros,
-  cargar: (registros) => registros.forEach(({ id, created_at, ...datos }) => crearRegistro(datos))
+  cargar: cargarRegistros
 };
 
 async function guardarEstado() {
@@ -132,13 +132,24 @@ router.delete('/registros/:id', verificarToken, async (req, res, next) => {
 });
 
 router.post('/importar-excel', verificarToken, async (req, res, next) => {
+  let preparacion;
   try {
-    const lista = Array.isArray(req.body) ? req.body : req.body.registros;
-    const importados = importarRegistros(lista);
-    await guardarEstado();
-    return res.status(201).json({ importados: importados.length });
+    const { headers, rows, firstDataRow } = req.body || {};
+    preparacion = prepararImportacion(headers, rows, firstDataRow);
   } catch (error) {
     error.status = 400;
+    return next(error);
+  }
+
+  try {
+    const ids = await insertarRegistros(preparacion.registros);
+    const importados = registrarImportados(preparacion.registros, ids);
+    return res.status(201).json({
+      importados: importados.length,
+      omitidos: preparacion.filasOmitidas.length,
+      filasOmitidas: preparacion.filasOmitidas
+    });
+  } catch (error) {
     return next(error);
   }
 });
