@@ -30,6 +30,9 @@ async function initTable() {
     await database.query('ALTER TABLE registros DROP COLUMN IF EXISTS profesor');
     await database.query('ALTER TABLE registros DROP COLUMN IF EXISTS "codigoModulo"');
     await database.query('ALTER TABLE registros ADD COLUMN IF NOT EXISTS modalidad TEXT');
+    await database.query('ALTER TABLE registros ADD COLUMN IF NOT EXISTS semestre TEXT');
+    await database.query('ALTER TABLE registros ADD COLUMN IF NOT EXISTS corte TEXT');
+    await database.query('ALTER TABLE registros ADD COLUMN IF NOT EXISTS modulo TEXT');
   } catch (error) {
     console.warn('No se pudo inicializar PostgreSQL:', error.message);
   }

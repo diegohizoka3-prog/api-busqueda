@@ -22,6 +22,8 @@ const ENCABEZADOS_IMPORTACION = [
   'NOMBRE DEL MÓDULO'
 ];
 
+const ENCABEZADOS_REQUERIDOS = ['AULA', 'HORARIO', 'PROGRAMA', 'NOMBRE DEL MÓDULO'];
+
 const MAPEO_IMPORTACION = {
   'AULA': 'salon',
   'HORARIO': 'horarioClase',
@@ -93,9 +95,14 @@ function prepararImportacion(headers, rows, firstDataRow = 2) {
     throw new Error('Las filas del archivo deben ser una lista de filas.');
   }
 
-  const encabezadosFaltantes = ENCABEZADOS_IMPORTACION.filter((header) => !headers.includes(header));
-  if (encabezadosFaltantes.length) {
-    throw new Error(`Los encabezados deben ser exactamente: ${ENCABEZADOS_IMPORTACION.join(', ')}. Tu archivo tiene: ${headers.join(', ')}.`);
+  const encabezadosFaltantes = ENCABEZADOS_REQUERIDOS.filter((header) => !headers.includes(header));
+  const encabezadosDesconocidos = headers.filter((header) => !ENCABEZADOS_IMPORTACION.includes(header));
+  if (encabezadosFaltantes.length || encabezadosDesconocidos.length) {
+    throw new Error(`Los encabezados obligatorios son: ${ENCABEZADOS_REQUERIDOS.join(', ')} y solo se aceptan: ${ENCABEZADOS_IMPORTACION.join(', ')}. Tu archivo tiene: ${headers.join(', ')}.`);
+  }
+
+  if (new Set(headers).size !== headers.length) {
+    throw new Error('El archivo contiene encabezados duplicados.');
   }
 
   const registrosImportados = [];
@@ -103,11 +110,12 @@ function prepararImportacion(headers, rows, firstDataRow = 2) {
   rows.forEach((row, rowIndex) => {
     const registro = {};
     for (const [header, campo] of Object.entries(MAPEO_IMPORTACION)) {
-      const value = row[headers.indexOf(header)];
-      registro[campo] = value == null ? '' : String(value);
+      const columnIndex = headers.indexOf(header);
+      const value = columnIndex === -1 ? null : row[columnIndex];
+      registro[campo] = value == null ? null : String(value);
     }
 
-    const faltantes = CAMPOS_REQUERIDOS.some((campo) => !registro[campo].trim());
+    const faltantes = CAMPOS_REQUERIDOS.some((campo) => !registro[campo]?.trim());
     if (faltantes) {
       filasOmitidas.push(firstDataRow + rowIndex);
     } else {
@@ -115,7 +123,12 @@ function prepararImportacion(headers, rows, firstDataRow = 2) {
     }
   });
 
-  return { registros: registrosImportados, filasOmitidas };
+  return {
+    registros: registrosImportados,
+    filasOmitidas,
+    importados: registrosImportados.length,
+    omitidos: filasOmitidas.length
+  };
 }
 
 function registrarImportados(lista, ids = null) {
