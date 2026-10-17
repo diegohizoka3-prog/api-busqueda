@@ -1,6 +1,6 @@
 import type { Estadisticas, Registro } from "./types"
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || "https://api-busqueda-219bw1qxs-diegohizoka3-1705.vercel.app").replace(/\/$/, "")
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || "https://api-busqueda-prod.vercel.app").replace(/\/$/, "")
 
 export async function getEstadisticas(): Promise<Estadisticas> {
   const res = await fetch(`${API_URL}/api/v1/estadisticas`, { cache: "no-store" })
